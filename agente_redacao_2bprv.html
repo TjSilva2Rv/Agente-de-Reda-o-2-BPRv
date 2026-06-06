@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agente de Redação — 2º BPRv</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #111111;
+    --black2: #1c1c1c;
+    --darkgray: #2a2a2a;
+    --midgray: #4a4a4a;
+    --gray: #888888;
+    --lightgray: #c0c0c0;
+    --offwhite: #f2f0eb;
+    --white: #ffffff;
+    --yellow: #f0c030;
+    --yellow-dim: #c9a020;
+    --yellow-bg: #2d2a1a;
+    --yellow-border: #e0a800;
+  }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--black);
+    font-family: 'Barlow', sans-serif;
+    color: var(--offwhite);
+    font-size: 15px;
+  }
+
+  .page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 80px;
+  }
+
+  /* HEADER */
+  .header {
+    width: 100%;
+    background: var(--black2);
+    border-bottom: 3px solid var(--yellow);
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 72px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-titles h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--offwhite);
+    line-height: 1;
+  }
+
+  .header-titles p {
+    font-size: 10px;
+    color: var(--gray);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .header-badge {
+    background: var(--yellow);
+    color: var(--black);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-left: auto;
+  }
+
+  /* CARD */
+  .card {
+    width: 100%;
+    max-width: 720px;
+    margin-top: 32px;
+    padding: 0 16px;
+  }
+
+  /* SECTION BLOCK */
+  .section-block {
+    background: var(--black2);
+    border: 0.5px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .section-head {
+    background: var(--darkgray);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 0.5px solid #3a3a3a;
+  }
+
+  .section-head-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--yellow);
+    color: var(--black);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .section-head-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--lightgray);
+  }
+
+  .section-body { padding: 20px; }
+
+  /* TIPO GRID */
+  .tipo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .tipo-btn {
+    background: var(--darkgray);
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    padding: 14px 10px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tipo-btn:hover { border-color: var(--yellow-dim); background: var(--yellow-bg); }
+  .tipo-btn.active { border: 1.5px solid var(--yellow); background: var(--yellow-bg); }
+
+  .tipo-btn .tb-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--midgray);
+    color: var(--offwhite);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .tipo-btn.active .tb-num { background: var(--yellow); color: var(--black); }
+
+  .tipo-btn .tb-label {
+    font-size: 11px; color: var(--gray);
+    line-height: 1.35; font-weight: 500;
+    transition: color 0.15s;
+  }
+
+  .tipo-btn.active .tb-label { color: var(--yellow); }
+  .tipo-btn:hover .tb-label { color: var(--lightgray); }
+
+  /* FIELDS */
+  .extras-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .field-group {
+    flex: 1; min-width: 200px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+
+  .field-label {
+    font-size: 10px; color: var(--gray);
+    text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500;
+  }
+
+  .field-input, .field-select {
+    background: var(--darkgray);
+    border: 0.5px solid #444;
+    border-radius: 5px;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: 'Barlow', sans-serif;
+    color: var(--offwhite);
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+
+  .field-input:focus, .field-select:focus {
+    border-color: var(--yellow);
+    box-shadow: 0 0 0 2px rgba(240,192,48,0.1);
+  }
+
+  .field-input::placeholder { color: var(--midgray); }
+  .field-select option { background: var(--darkgray); }
+
+  /* DROP ZONE */
+  .drop-zone {
+    border: 1.5px dashed #3a3a3a;
+    border-radius: 8px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    background: var(--darkgray);
+  }
+
+  .drop-zone:hover, .drop-zone.over { border-color: var(--yellow); background: var(--yellow-bg); }
+  .drop-zone.has-file { border-color: var(--yellow); border-style: solid; background: var(--yellow-bg); }
+
+  .drop-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0;
+    cursor: pointer; width: 100%; height: 100%; font-size: 0;
+  }
+
+  .dz-icon { font-size: 32px; margin-bottom: 10px; color: var(--midgray); display: block; transition: color 0.2s; }
+  .drop-zone:hover .dz-icon, .drop-zone.has-file .dz-icon { color: var(--yellow); }
+
+  .dz-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase; color: var(--lightgray);
+  }
+
+  .dz-sub { font-size: 11px; color: var(--gray); margin-top: 5px; }
+
+  /* DIVIDER */
+  .divider-or { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
+  .divider-or hr { flex: 1; border: none; border-top: 0.5px solid #3a3a3a; }
+  .divider-or span { font-size: 10px; color: var(--midgray); text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
+
+  /* TEXTAREA */
+  .text-area {
+    width: 100%;
+    background: var(--darkgray);
+    border: 0.5px solid #444;
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-family: 'Barlow', sans-serif;
+    color: var(--offwhite);
+    resize: vertical;
+    min-height: 120px;
+    outline: none;
+    line-height: 1.65;
+    transition: border-color 0.15s;
+  }
+
+  .text-area:focus { border-color: var(--yellow); box-shadow: 0 0 0 2px rgba(240,192,48,0.1); }
+  .text-area::placeholder { color: var(--midgray); }
+
+  /* GENERATE BTN */
+  .generate-btn {
+    width: 100%;
+    background: var(--yellow);
+    color: var(--black);
+    border: none;
+    border-radius: 6px;
+    padding: 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .generate-btn:hover { background: var(--yellow-dim); transform: translateY(-1px); }
+  .generate-btn:active { transform: translateY(0); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* LOADING */
+  .loading-block {
+    background: var(--black2);
+    border: 0.5px solid #333;
+    border-radius: 8px;
+    padding: 32px 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #333;
+    border-top: 3px solid var(--yellow);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gray);
+  }
+
+  /* RESULTADO */
+  .resultado-block {
+    background: var(--black2);
+    border: 0.5px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .resultado-head {
+    background: var(--darkgray);
+    padding: 10px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 0.5px solid #3a3a3a;
+  }
+
+  .resultado-head-left {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .resultado-check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #2a5c2a;
+    color: #7fd47f;
+    font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .resultado-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--lightgray);
+  }
+
+  .copy-btn {
+    background: var(--darkgray);
+    border: 0.5px solid #444;
+    border-radius: 4px;
+    color: var(--gray);
+    font-size: 11px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 5px 14px;
+    cursor: pointer; transition: all 0.15s;
+  }
+
+  .copy-btn:hover { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+
+  .resultado-body { padding: 20px; }
+
+  .resultado-texto {
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: var(--offwhite);
+    white-space: pre-wrap;
+    font-family: 'Barlow', sans-serif;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  /* AVISO */
+  .aviso {
+    background: var(--darkgray);
+    border-top: 0.5px solid #3a3a3a;
+    padding: 12px 18px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+
+  .aviso-text { font-size: 11px; color: var(--gray); line-height: 1.6; }
+  .aviso-text strong { color: var(--yellow); font-weight: 500; }
+
+  /* ERRO */
+  .erro-block {
+    background: #2a1414;
+    border: 0.5px solid #5a2020;
+    border-left: 3px solid #e05050;
+    border-radius: 6px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #e08080;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  /* FOOTER */
+  .footer {
+    width: 100%;
+    background: var(--black2);
+    border-top: 1px solid #222;
+    padding: 10px 28px;
+    display: flex; align-items: center; gap: 10px;
+    position: fixed; bottom: 0;
+  }
+
+  .footer-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%; background: var(--yellow);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .footer-text { font-size: 10px; color: var(--midgray); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .hidden { display: none !important; }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--black2); }
+  ::-webkit-scrollbar-thumb { background: var(--midgray); border-radius: 4px; }
+
+  @media (max-width: 540px) {
+    .tipo-grid { grid-template-columns: repeat(2, 1fr); }
+    .header-badge { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <svg width="40" height="46" viewBox="0 0 40 46" fill="none">
+      <path d="M20 1L2 9V23C2 33 10 41.5 20 45C30 41.5 38 33 38 23V9L20 1Z" fill="#f0c030" stroke="#c9a020" stroke-width="1"/>
+      <path d="M20 7L7 13V23C7 30.5 13 37.5 20 41C27 37.5 33 30.5 33 23V13L20 7Z" fill="#111111"/>
+      <text x="20" y="28" text-anchor="middle" fill="#f0c030" font-size="7.5" font-weight="700" font-family="'Barlow Condensed', sans-serif" letter-spacing="0.5">2ºBPRv</text>
+    </svg>
+    <div class="header-titles">
+      <h1>Agente de Redação — 2º BPRv</h1>
+      <p>Comunicação Social · P/5 · Bauru/SP</p>
+    </div>
+    <div class="header-badge">v3.3</div>
+  </header>
+
+  <!-- CARD -->
+  <div class="card">
+
+    <!-- BLOCO 1: TIPO -->
+    <div class="section-block">
+      <div class="section-head">
+        <div class="section-head-num">1</div>
+        <span class="section-head-label">Tipo de documento</span>
+      </div>
+      <div class="section-body">
+        <div class="tipo-grid">
+          <button class="tipo-btn active" onclick="selectTipo(this,'lmp')">
+            <div class="tb-num">1</div>
+            <div class="tb-label">Láurea de Mérito Pessoal</div>
+          </button>
+          <button class="tipo-btn" onclick="selectTipo(this,'elogio')">
+            <div class="tb-num">2</div>
+            <div class="tb-label">Elogio Individual ou Coletivo</div>
+          </button>
+          <button class="tipo-btn" onclick="selectTipo(this,'pm_mes')">
+            <div class="tb-num">3</div>
+            <div class="tb-label">Policial do Mês</div>
+          </button>
+          <button class="tipo-btn" onclick="selectTipo(this,'destaque')">
+            <div class="tb-num">4</div>
+            <div class="tb-label">Ocorrência Destaque</div>
+          </button>
+          <button class="tipo-btn" onclick="selectTipo(this,'release')">
+            <div class="tb-num">5</div>
+            <div class="tb-label">Release de Imprensa</div>
+          </button>
+          <button class="tipo-btn" onclick="selectTipo(this,'instagram')">
+            <div class="tb-num">6</div>
+            <div class="tb-label">Legenda de Instagram</div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXTRAS LMP -->
+    <div class="section-block" id="extras-lmp">
+      <div class="section-head">
+        <div class="section-head-num">2</div>
+        <span class="section-head-label">Detalhes da LMP</span>
+      </div>
+      <div class="section-body">
+        <div class="extras-row">
+          <div class="field-group">
+            <label class="field-label">Graduação + Nome de Guerra</label>
+            <input class="field-input" type="text" id="lmp-nome" placeholder="Ex: Cb PM Silva">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Grau da LMP</label>
+            <select class="field-select" id="lmp-grau">
+              <option>1º Grau</option>
+              <option>2º Grau</option>
+              <option>3º Grau</option>
+              <option>4º Grau</option>
+              <option>5º Grau</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXTRAS ELOGIO -->
+    <div class="section-block hidden" id="extras-elogio">
+      <div class="section-head">
+        <div class="section-head-num">2</div>
+        <span class="section-head-label">Tipo de Elogio</span>
+      </div>
+      <div class="section-body">
+        <div class="extras-row">
+          <div class="field-group">
+            <label class="field-label">Modalidade</label>
+            <select class="field-select" id="elogio-tipo">
+              <option value="INDIVIDUALMENTE">Individual</option>
+              <option value="A EQUIPE">Coletivo / Equipe</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXTRAS PM MES -->
+    <div class="section-block hidden" id="extras-pm_mes">
+      <div class="section-head">
+        <div class="section-head-num">2</div>
+        <span class="section-head-label">Dados do Policial</span>
+      </div>
+      <div class="section-body">
+        <div class="extras-row">
+          <div class="field-group">
+            <label class="field-label">Graduação + Nome de Guerra</label>
+            <input class="field-input" type="text" id="pm-nome" placeholder="Ex: 1º Sgt PM Rodrigues">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Mês / Ano de Referência</label>
+            <input class="field-input" type="text" id="pm-mes" placeholder="Ex: Junho/2026">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Natureza da Atuação</label>
+            <select class="field-select" id="pm-natureza">
+              <option value="OPERACIONAL">Operacional</option>
+              <option value="ADMINISTRATIVA">Administrativa</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCO DADOS -->
+    <div class="section-block">
+      <div class="section-head">
+        <div class="section-head-num" id="dados-num">3</div>
+        <span class="section-head-label" id="dados-label">Dados da ocorrência</span>
+      </div>
+      <div class="section-body">
+        <div class="drop-zone" id="dropZone"
+          ondragover="event.preventDefault();this.classList.add('over')"
+          ondragleave="this.classList.remove('over')"
+          ondrop="handleDrop(event)">
+          <input type="file" accept=".pdf,.doc,.docx,.txt" onchange="handleFile(this)" id="fileInput">
+          <span class="dz-icon">📎</span>
+          <div class="dz-title" id="dz-title">Arraste o arquivo aqui ou clique para selecionar</div>
+          <div class="dz-sub" id="dz-sub">PDF, Word (.doc/.docx) ou TXT</div>
+        </div>
+
+        <div class="divider-or">
+          <hr><span>ou insira o texto diretamente</span><hr>
+        </div>
+
+        <textarea class="text-area" id="dados-texto"
+          placeholder="Cole aqui os dados brutos da ocorrência, relatório, rascunho ou minuta..."></textarea>
+      </div>
+    </div>
+
+    <!-- BOTÃO -->
+    <button class="generate-btn" id="generate-btn" onclick="gerarDocumento()">
+      ⚡ Gerar Documento
+    </button>
+
+    <!-- LOADING -->
+    <div class="loading-block hidden" id="loading-block">
+      <div class="spinner"></div>
+      <div class="loading-text">Gerando documento — aguarde...</div>
+    </div>
+
+    <!-- ERRO -->
+    <div class="erro-block hidden" id="erro-block"></div>
+
+    <!-- RESULTADO -->
+    <div class="resultado-block hidden" id="resultado-block">
+      <div class="resultado-head">
+        <div class="resultado-head-left">
+          <div class="resultado-check">✓</div>
+          <span class="resultado-label" id="resultado-label">Documento gerado</span>
+        </div>
+        <button class="copy-btn" onclick="copiarTexto()">Copiar</button>
+      </div>
+      <div class="resultado-body">
+        <div class="resultado-texto" id="resultado-texto"></div>
+      </div>
+      <div class="aviso">
+        <div class="aviso-text">
+          ⚠️ <strong>Revise antes do uso oficial.</strong>
+          A IA garante padronização e celeridade — o operador garante a veracidade e adequação ao caso concreto.
+          Manual de Prompts Mestres v3.3 — 2º BPRv.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-dot"></div>
+  <span class="footer-text">2º Batalhão de Polícia Rodoviária · Bauru/SP · Prompts Mestres v3.3</span>
+</footer>
+
+<script>
+const GEMINI_API_KEY = 'AQ.Ab8RN6JlIC9XkGp54Ag_u0gpugWdZXitrUSXfERodGyAO5Wtzg';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+let tipoAtual = 'lmp';
+let arquivoTexto = '';
+let nomeArquivo = '';
+
+const labelsSecao = {
+  lmp: 'Dados da ocorrência / LMP',
+  elogio: 'Dados do elogio',
+  pm_mes: 'Dados do mês de referência',
+  destaque: 'Dados da ocorrência destaque',
+  release: 'Dados do sinistro',
+  instagram: 'Dados da ocorrência'
+};
+
+const numerosSecao = {
+  lmp: '3', elogio: '3', pm_mes: '3',
+  destaque: '2', release: '2', instagram: '2'
+};
+
+const nomesDocumento = {
+  lmp: 'Síntese Histórica — LMP',
+  elogio: 'Elogio Militar',
+  pm_mes: 'Indicação — Policial do Mês',
+  destaque: 'Resumo — Ocorrência Destaque',
+  release: 'Nota à Imprensa',
+  instagram: 'Legenda de Instagram'
+};
+
+function selectTipo(btn, tipo) {
+  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  tipoAtual = tipo;
+
+  ['lmp','elogio','pm_mes'].forEach(id => {
+    const el = document.getElementById('extras-' + id);
+    if (el) el.classList.add('hidden');
+  });
+
+  if (tipo === 'lmp') document.getElementById('extras-lmp').classList.remove('hidden');
+  if (tipo === 'elogio') document.getElementById('extras-elogio').classList.remove('hidden');
+  if (tipo === 'pm_mes') document.getElementById('extras-pm_mes').classList.remove('hidden');
+
+  document.getElementById('dados-label').textContent = labelsSecao[tipo];
+  document.getElementById('dados-num').textContent = numerosSecao[tipo];
+  document.getElementById('resultado-block').classList.add('hidden');
+  document.getElementById('erro-block').classList.add('hidden');
+}
+
+function handleFile(input) {
+  if (input.files && input.files[0]) lerArquivo(input.files[0]);
+}
+
+function handleDrop(event) {
+  event.preventDefault();
+  document.getElementById('dropZone').classList.remove('over');
+  const files = event.dataTransfer.files;
+  if (files && files[0]) lerArquivo(files[0]);
+}
+
+function lerArquivo(file) {
+  nomeArquivo = file.name;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    arquivoTexto = e.target.result;
+    marcarArquivo(file.name);
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function marcarArquivo(nome) {
+  const dz = document.getElementById('dropZone');
+  dz.classList.add('has-file');
+  document.getElementById('dz-title').textContent = '✓ ' + nome;
+  document.getElementById('dz-sub').textContent = 'Arquivo carregado e pronto para processar';
+}
+
+document.addEventListener('paste', function(e) {
+  const items = e.clipboardData && e.clipboardData.items;
+  if (!items) return;
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].kind === 'file') {
+      lerArquivo(items[i].getAsFile());
+    }
+  }
+});
+
+function montarPrompt() {
+  const textoCampo = document.getElementById('dados-texto').value.trim();
+  const dadosBrutos = arquivoTexto
+    ? `${arquivoTexto}\n\n${textoCampo ? 'DADOS ADICIONAIS:\n' + textoCampo : ''}`
+    : textoCampo;
+
+  const regrasGlobais = `
+REGRAS GLOBAIS OBRIGATÓRIAS — PMESP:
+1. Postos/Graduações: padrão militar (Ex: Cb PM, 1º Sgt PM, Cb PM Rodrigues)
+2. Data: formato DDMMMAA (Ex: 19MAI26, 03ABR26)
+3. Hora: formato HHhMMmin (Ex: 10h50min, 14h30min)
+4. Rodovias: "SP-XXX, Km XXX" ou com nome oficial "SP-XXX Rodovia [Nome], Km xxx,xxx"
+5. Tom: formal, objetivo, sóbrio e profissional. Sem adjetivações excessivas
+6. Polícia Civil: "Delegacia de Polícia de [Município]" ou "Plantão Policial de [Município]". Responsável = "Delegado de Plantão". PROIBIDO: "Autoridade Policial"
+7. PROIBIDO: "entorpecente" → use "droga", "maconha", "cocaína", "crack" etc.
+8. Infratores: "infrator" ou "criminoso". PROIBIDO: "indiciado", "cidadão", "indivíduo"
+9. Procurados: apenas "Procurado". PROIBIDO: "procurado pela/da justiça"
+10. Ilícito com pessoa = "busca pessoal". Ilícito no veículo = "vistoria veicular". JAMAIS "revista"
+11. JAMAIS diga que o Delegado "ratificou" o flagrante. O Delegado de Plantão elaborou o auto de prisão em flagrante delito
+12. TOR = "Patrulhamento Tático" | Equipe regular = "Patrulhamento"
+13. Dados faltantes: retornar "POR FAVOR INFORME: [informação faltante]"
+14. Rigor absoluto: atenha-se estritamente aos fatos fornecidos. Não invente dados`;
+
+  if (tipoAtual === 'lmp') {
+    const nome = document.getElementById('lmp-nome').value.trim() || '[INFORMAR GRADUAÇÃO E NOME DE GUERRA]';
+    const grau = document.getElementById('lmp-grau').value;
+    return `Você é um Agente de Redação Institucional especializado na PMESP, auxiliando o 2º BPRv.
+${regrasGlobais}
+
+TAREFA: Gere uma Síntese Histórica para Láurea do Mérito Pessoal (LMP) no padrão PMESP.
+
+MILITAR: ${nome}
+GRAU DA LMP: ${grau}
+
+REGRAS ESPECÍFICAS:
+- Texto totalmente corrido, sem listas ou marcadores
+- Início OBRIGATÓRIO: "Por ter em [DATA MILITAR], [DESCRIÇÃO DO FATO PRINCIPAL]"
+- Foco no fato gerador (ocorrência mais recente)
+- Cronologia inversa para fatos complementares (mais recente → mais antigo)
+- Encerramento OBRIGATÓRIO: "..., o que o qualifica, de forma inequívoca, para a concessão da Láurea do Mérito Pessoal em ${grau}."
+
+DADOS FORNECIDOS:
+${dadosBrutos}
+
+Gere APENAS o texto do documento, sem explicações, sem cabeçalhos extras, sem comentários.`;
+
+  } else if (tipoAtual === 'elogio') {
+    const modalidade = document.getElementById('elogio-tipo').value;
+    return `Você é um Agente de Redação Institucional especializado na PMESP, auxiliando o 2º BPRv.
+${regrasGlobais}
+
+TAREFA: Gere um Elogio Militar no padrão PMESP, baseado normativamente nos Artigos 67 e 68 do RDPM.
+
+MODALIDADE: ${modalidade}
+
+REGRAS ESPECÍFICAS:
+- Máximo 15 linhas. Ideal: 10 linhas
+- Início OBRIGATÓRIO: "Elogio ${modalidade} o [POSTO/GRADUAÇÃO]..."
+- Exalte tirocínio policial, espírito de corpo, dedicação abnegada ao serviço e reflexo positivo para a imagem pública do 2º BPRv
+- Finalize com frase de enaltecimento institucional
+
+DADOS FORNECIDOS:
+${dadosBrutos}
+
+Gere APENAS o texto do documento, sem explicações, sem cabeçalhos extras, sem comentários.`;
+
+  } else if (tipoAtual === 'pm_mes') {
+    const nome = document.getElementById('pm-nome').value.trim() || '[INFORMAR GRADUAÇÃO E NOME DE GUERRA]';
+    const mes  = document.getElementById('pm-mes').value.trim() || '[INFORMAR MÊS/ANO]';
+    const nat  = document.getElementById('pm-natureza').value;
+    return `Você é um Agente de Redação Institucional especializado na PMESP, auxiliando o 2º BPRv.
+${regrasGlobais}
+
+TAREFA: Gere a Síntese Histórica de Indicação para o Policial do Mês no padrão PMESP.
+
+MILITAR: ${nome}
+MÊS/ANO DE REFERÊNCIA: ${mes}
+NATUREZA DA ATUAÇÃO: ${nat}
+
+REGRAS ESPECÍFICAS:
+- Texto totalmente corrido (prosa)
+- Início OBRIGATÓRIO: "Indico para Policial do Mês de ${mes} o ${nome}, por ter..."
+${nat === 'ADMINISTRATIVA'
+  ? '- Foco em proatividade, otimização de processos e assertividade técnica\n- PROIBIDO: citar "abstenção de folgas" ou jornadas exaustivas'
+  : '- Inclua dados quantitativos e métricas operacionais do período'}
+- Finalize com menção de que o militar é merecedor deste "singelo reconhecimento"
+
+DADOS FORNECIDOS:
+${dadosBrutos}
+
+Gere APENAS o texto do documento, sem explicações, sem cabeçalhos extras, sem comentários.`;
+
+  } else if (tipoAtual === 'destaque') {
+    return `Você é um Agente de Redação Institucional especializado na PMESP, auxiliando o 2º BPRv.
+${regrasGlobais}
+
+TAREFA: Gere o Resumo Histórico de Ocorrência Destaque no padrão PMESP.
+
+REGRAS ESPECÍFICAS:
+- Narrativa impessoal e institucional (foco na equipe/guarnição)
+- Sóbria, detalhada e sem adjetivações cinematográficas
+- Narre a cronologia tática: abordagem por fundada suspeita, tirocínio na vistoria veicular ou busca pessoal, localização do ilícito e condução à Polícia Judiciária
+- Exalte a excelência técnica e o desprendimento da guarnição
+
+DADOS FORNECIDOS:
+${dadosBrutos}
+
+Gere APENAS o texto do documento, sem explicações, sem cabeçalhos extras, sem comentários.`;
+
+  } else if (tipoAtual === 'release') {
+    return `Você é um Assessor de Imprensa do 2º BPRv.
+${regrasGlobais}
+
+TAREFA: Gere uma Nota à Imprensa em formato de pirâmide invertida.
+
+REGRAS ESPECÍFICAS:
+1. SIGILO ABSOLUTO: proibido nomear policiais, vítimas ou envolvidos. Civis: sexo e idade apenas (Ex: "um homem de 34 anos")
+2. Obrigatório: marca/modelo dos veículos e sentido de direção de cada um
+3. Obrigatório: resultado do etilômetro ou justificativa técnica/médica para a não realização
+4. Obrigatório: identificar o órgão de socorro e o hospital de destino das vítimas
+5. PROIBIDO: termos poéticos ou subjetivos
+
+ESTRUTURA OBRIGATÓRIA DA SAÍDA:
+NOTA À IMPRENSA
+ASSUNTO: [Título Objetivo]
+LOCAL: [Rodovia / Km / Município]
+
+[Texto do release em pirâmide invertida]
+
+"O Policiamento Rodoviário reforça seu compromisso com a Segurança Viária e a Proteção da Vida, orientando que os motoristas... [orientação de direção defensiva específica para o caso]."
+
+DADOS FORNECIDOS:
+${dadosBrutos}
+
+Gere APENAS o texto do documento conforme a estrutura acima, sem comentários adicionais.`;
+
+  } else if (tipoAtual === 'instagram') {
+    return `Você é um Agente de Redação Institucional especializado na PMESP, auxiliando o 2º BPRv.
+${regrasGlobais}
+
+TAREFA: Crie uma legenda de alta retenção para o Instagram oficial do 2º BPRv.
+
+REGRAS ESPECÍFICAS:
+- Início OBRIGATÓRIO: título em CAIXA ALTA resumindo o feito, incluindo município/região
+- ESTRUTURA EM 3 PARÁGRAFOS (com linha em branco entre cada):
+  1º (Gancho): operação, equipe (TOR="Patrulhamento Tático" / regular="Patrulhamento"), rodovia com Km, município e fato principal
+  2º (Ação Tática): abordagem, fundada suspeita e localização exata do ilícito
+  3º (Desfecho): impacto ao crime (peso/unidades ou prejuízo estimado), destino do infrator, encaminhamento ao "Delegado de Plantão" e compromisso da Unidade com a segurança das rodovias
+- Obrigatório: identificar rodovia (com Km), município e data/período da ação
+- Finalizar com bloco de hashtags:
+  #PoliciaMilitarSP #PoliciamentoRodoviario #2BPRv #[NomeDoMunicipio] [hashtag da operação se houver]
+
+DADOS FORNECIDOS:
+${dadosBrutos}
+
+Gere APENAS a legenda formatada, sem comentários, sem explicações.`;
+  }
+}
+
+async function gerarDocumento() {
+  const textoCampo = document.getElementById('dados-texto').value.trim();
+  if (!textoCampo && !arquivoTexto) {
+    mostrarErro('Por favor, anexe um arquivo ou insira os dados no campo de texto.');
+    return;
+  }
+
+  const btn = document.getElementById('generate-btn');
+  btn.disabled = true;
+
+  document.getElementById('resultado-block').classList.add('hidden');
+  document.getElementById('erro-block').classList.add('hidden');
+  document.getElementById('loading-block').classList.remove('hidden');
+
+  const prompt = montarPrompt();
+
+  try {
+    const response = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 8192
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err?.error?.message || `Erro HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const texto = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    if (!texto) throw new Error('A IA não retornou conteúdo. Tente novamente.');
+
+    document.getElementById('loading-block').classList.add('hidden');
+    document.getElementById('resultado-label').textContent = nomesDocumento[tipoAtual] + ' — Gerado';
+    document.getElementById('resultado-texto').textContent = texto.trim();
+    document.getElementById('resultado-block').classList.remove('hidden');
+    document.getElementById('resultado-block').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch (error) {
+    document.getElementById('loading-block').classList.add('hidden');
+    mostrarErro('Erro ao conectar com a IA: ' + error.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function mostrarErro(msg) {
+  const el = document.getElementById('erro-block');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.remove('hidden');
+}
+
+function copiarTexto() {
+  const texto = document.getElementById('resultado-texto').textContent;
+  navigator.clipboard.writeText(texto).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copiado ✓';
+    btn.style.background = '#f0c030';
+    btn.style.color = '#111';
+    setTimeout(() => {
+      btn.textContent = 'Copiar';
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>
